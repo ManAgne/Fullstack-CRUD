@@ -1,6 +1,8 @@
 const { removeEmptyProps } = require('../helpers');
-const { createNotFoundError, sendErrorResponse } = require('../helpers/errors')
-const ProductModel = require('../models/product-model')
+const { createNotFoundError, sendErrorResponse } = require('../helpers/errors');
+const ProductModel = require('../models/product-model');
+const createProductPopulatedViewModel = require('../view-models/create-product-populated-view-model');
+const createProductViewModel = require('../view-models/create-product-view-model');
 
 const createProductNotFoundError = (productId) => createNotFoundError(`Product with id '${productId}' was not found`);
 
@@ -12,7 +14,7 @@ const fetchAll = async (req, res) => {
       ? await ProductModel.find().populate('categoryId')
       : await ProductModel.find();
 
-    res.status(200).json(productDocuments);
+    res.status(200).json(productDocuments.map(createProductPopulatedViewModel));
   } catch (err) { sendErrorResponse(err, res) }
 };
 
@@ -26,7 +28,7 @@ const fetch = async (req, res) => {
       : await ProductModel.findById(productId);
     if (foundProduct === null) throw createProductNotFoundError(productId);
 
-    res.status(200).json(foundProduct);
+    res.status(200).json(createProductViewModel(newProduct));
   } catch (err) { sendErrorResponse(err, res) }
 };
 
@@ -38,7 +40,7 @@ const create = async (req, res) => {
 
     const newProduct = await ProductModel.create(newProductData)
 
-    res.status(201).json(newProduct)
+    res.status(201).json(createProductViewModel(newProduct))
 
   } catch (err) { sendErrorResponse(err, res) }
 };
@@ -58,7 +60,7 @@ const replace = async (req, res) => {
       );
     if (updatedProduct === null) throw createProductNotFoundError(productId);
 
-    res.status(200).json(updatedProduct)
+    res.status(200).json(createProductViewModel(newProduct))
 
   } catch (err) { sendErrorResponse(err, res) }
 };
@@ -79,7 +81,7 @@ const update = async (req, res) => {
 
     if (updatedProduct === null) throw createProductNotFoundError(productId);
 
-    res.status(200).json(updatedProduct)
+    res.status(200).json(createProductViewModel(newProduct))
 
   } catch (err) { sendErrorResponse(err, res) }
 };
@@ -91,7 +93,7 @@ const remove = async (req, res) => {
     const deletedProduct = await ProductModel.findByIdAndDelete(productId);
     if (deletedProduct === null) throw createProductNotFoundError(productId);
 
-    res.status(200).json(deletedProduct);
+    res.status(200).json(createProductViewModel(deletedProduct));
   } catch (err) { sendErrorResponse(err, res) }
 };
 

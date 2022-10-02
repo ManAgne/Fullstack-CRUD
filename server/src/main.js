@@ -4,13 +4,13 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const apiRouter = require('./routers/api-router');
-const authRouter = require('./routers/auth-router');
+const categoriesRouter = require('./routers/categories-router');
+const productsRouter = require('./routers/products-router');
 
 const server = express();
 
-const { SERVER_DOMAIN, SERVER_PROTOCOL, SERVER_PORT, DB_CONNECTION, TOKEN_SECRET } = process.env;
-const constantsConfiguredInEnvFile = SERVER_DOMAIN && SERVER_PROTOCOL && SERVER_PORT && DB_CONNECTION && TOKEN_SECRET;
+const { SERVER_DOMAIN, SERVER_PROTOCOL, SERVER_PORT, DB_CONNECTION } = process.env;
+const constantsConfiguredInEnvFile = SERVER_DOMAIN && SERVER_PROTOCOL && SERVER_PORT && DB_CONNECTION;
 
 try {
   if (!constantsConfiguredInEnvFile) {
@@ -24,8 +24,13 @@ try {
   server.use(express.static('public'))
 
   // Routes
-  server.use('/api', apiRouter);
-  server.use('/auth', authRouter);
+  server.use('/products', productsRouter);
+  server.use('/categories', categoriesRouter);
+
+  // React App
+  server.get('/', function (req, res) {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  });
 
   mongoose.connect(DB_CONNECTION_ADMIN, (err) => {
       if(err){
