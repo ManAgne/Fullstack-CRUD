@@ -4,8 +4,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const categoriesRouter = require('./routers/categories-router');
 const productsRouter = require('./routers/products-router');
+const categoriesRouter = require('./routers/categories-router');
 
 const server = express();
 
@@ -32,7 +32,7 @@ try {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
   });
 
-  mongoose.connect(DB_CONNECTION_ADMIN, (err) => {
+  mongoose.connect(DB_CONNECTION, (err) => {
       if(err){
         throw err.message;
       }

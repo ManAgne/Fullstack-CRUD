@@ -1,10 +1,10 @@
-# CRUD with React MUI
+# CRUD with Nodejs + Express
 
 ## install dependecies
 ```
 npm i
 ```
 
-## launch client
+## launch server
 npm run start
 ```

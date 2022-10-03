@@ -1,28 +1,10 @@
 const serverAddress = 'http://localhost:8000';
 
-const formatProduct = ({
-  id,
-  title,
-  description,
-  price,
-  img,
-  categoryId,
-  category,
-}) => ({
-  id,
-  title,
-  description,
-  price,
-  img,
-  categoryId,
-  category: category.title,
-});
-
 const fetchAll = async () => {
-  const response = await fetch(`${serverAddress}/products?_expand=category`);
+  const response = await fetch(`${serverAddress}/products`);
   const products = await response.json();
 
-  return products.map(formatProduct);
+  return products;
 };
 
 const create = async (productProps) => {

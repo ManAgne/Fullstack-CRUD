@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import ProductService from 'services/product-service';
+import ProductService from '../services/product-service';
 
 const ProductForm = ({
   onSubmit,

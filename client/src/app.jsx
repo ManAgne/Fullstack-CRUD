@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Box, Grid, Modal } from '@mui/material';
 import ProductService from 'services/product-service';
-import { ProductCard, ProductForm } from 'components';
+import { ProductCard, ProductForm } from './components';
 
 const App = () => {
   const [products, setProducts] = React.useState([]);

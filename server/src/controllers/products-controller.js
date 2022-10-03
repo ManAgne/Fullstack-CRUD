@@ -7,62 +7,24 @@ const createProductViewModel = require('../view-models/create-product-view-model
 const createProductNotFoundError = (productId) => createNotFoundError(`Product with id '${productId}' was not found`);
 
 const fetchAll = async (req, res) => {
-  const { joinBy } = req.query;
-
   try {
-    const productDocuments = joinBy === 'categoryId'
-      ? await ProductModel.find().populate('categoryId')
-      : await ProductModel.find();
+    const productPopulatedDocs = await ProductModel.find().populate('categoryId');
 
-    res.status(200).json(productDocuments.map(createProductPopulatedViewModel));
-  } catch (err) { sendErrorResponse(err, res) }
-};
-
-const fetch = async (req, res) => {
-  const productId = req.params.id;
-  const { joinBy } = req.query;
-
-  try {
-    const foundProduct = joinBy === 'categoryId'
-      ? await ProductModel.findById(productId).populate('categoryId')
-      : await ProductModel.findById(productId);
-    if (foundProduct === null) throw createProductNotFoundError(productId);
-
-    res.status(200).json(createProductViewModel(newProduct));
-  } catch (err) { sendErrorResponse(err, res) }
+    res.status(200).json(productPopulatedDocs.map(createProductPopulatedViewModel));
+  } catch (err) { sendErrorResponse(err, res); }
 };
 
 const create = async (req, res) => {
   const newProductData = req.body;
 
   try {
-    ProductModel.validate(newProductData);
+    await ProductModel.validate(newProductData);
 
-    const newProduct = await ProductModel.create(newProductData)
+    const newProductDoc = await ProductModel.create(newProductData)
 
-    res.status(201).json(createProductViewModel(newProduct))
+    res.status(201).json(createProductViewModel(newProductDoc))
 
-  } catch (err) { sendErrorResponse(err, res) }
-};
-
-const replace = async (req, res) => {
-  const productId = req.params.id;
-  const { title, description, categoryId, img, price } = req.body;
-  const newProductData = { title, description, categoryId, img, price };
-
-  try {
-    ProductModel.validate(newProductData);
-
-    const updatedProduct = await ProductModel.findByIdAndUpdate(
-      productId, 
-      newProductData, 
-      { new: true, runValidators: true }
-      );
-    if (updatedProduct === null) throw createProductNotFoundError(productId);
-
-    res.status(200).json(createProductViewModel(newProduct))
-
-  } catch (err) { sendErrorResponse(err, res) }
+  } catch (err) { sendErrorResponse(err, res); }
 };
 
 const update = async (req, res) => {
@@ -71,37 +33,35 @@ const update = async (req, res) => {
   const newProductData = removeEmptyProps({ title, description, categoryId, img, price });
 
   try {
-    ProductModel.validateUpdate(newProductData);
+    await ProductModel.validateUpdate(newProductData);
 
-    const updatedProduct = await ProductModel.findByIdAndUpdate(
-      productId, 
-      newProductData, 
+    const updatedProductDoc = await ProductModel.findByIdAndUpdate(
+      productId,
+      newProductData,
       { new: true }
-      );
+    );
 
-    if (updatedProduct === null) throw createProductNotFoundError(productId);
+    if (updatedProductDoc === null) throw createProductNotFoundError(productId);
 
-    res.status(200).json(createProductViewModel(newProduct))
+    res.status(200).json(createProductViewModel(updatedProductDoc))
 
-  } catch (err) { sendErrorResponse(err, res) }
+  } catch (err) { sendErrorResponse(err, res); }
 };
 
 const remove = async (req, res) => {
   const productId = req.params.id;
 
   try {
-    const deletedProduct = await ProductModel.findByIdAndDelete(productId);
-    if (deletedProduct === null) throw createProductNotFoundError(productId);
+    const deletedProductDoc = await ProductModel.findByIdAndDelete(productId);
+    if (deletedProductDoc === null) createProductNotFoundError(productId);
 
-    res.status(200).json(createProductViewModel(deletedProduct));
-  } catch (err) { sendErrorResponse(err, res) }
+    res.status(200).json(createProductViewModel(deletedProductDoc));
+  } catch (err) { sendErrorResponse(err, res); }
 };
 
 module.exports = {
   fetchAll,
-  fetch,
   create,
-  replace,
   update,
   remove,
 };
